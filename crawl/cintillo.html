@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!--  template made by heine froholdt heine.froholdt@gmail.com  -->
+    <meta charset="UTF-8" />
+    <title>Template</title>
+
+    <style>
+
+        #bm {
+            position: fixed;                 
+                
+        }
+
+        #loop {
+            position: fixed;  
+          
+        }
+
+        body {
+            overflow: hidden;
+            margin: 0;
+
+        }
+ /* Wrapper for ticker */
+.ticker-container {
+      position: absolute;
+  width: 81%;
+  height: 10%;
+  bottom: 6%;
+  left: 53.2%;
+  transform: translateX(-50%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+    opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Inner text that scrolls */
+.ticker-text {
+  font-family: 'Ordina-CompressedXbd', sans-serif;
+  position: absolute;
+  white-space: nowrap;
+  font-size: 3vw;
+  animation: scroll 20s linear infinite;
+  color: rgb(147, 22, 22);
+}
+
+.ticker-container.hidden {
+  opacity: 0;
+  pointer-events: none; /* disable interaction when hidden */
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(var(--start-x));
+  }
+  100% {
+    transform: translateX(var(--end-x));
+  }
+}
+    </style>
+</head>
+
+<body>
+    <div id="bm">
+          <div class="ticker-container">
+        <div class="ticker-text" id="tickerText"></div>
+    </div>
+    </div>
+    <div id="loop">
+       
+    </div>
+   
+
+
+
+    <!-- Scripts -->
+    <script>let json_file = "cintillo.json" </script> 
+    <script src="webcg-framework.umd.js"></script>
+    <script src="lottie.js"></script>
+   <script src="cintillo.js"></script>
+    <script src="cintillo_index.js"></script>
+
+</body>
+
+</html>
