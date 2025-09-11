@@ -192,6 +192,25 @@ const animPromise = makeAnimPromise()
 webcg.on('data', function (data) {
     let updateTiming = 0
     console.log('data from casparcg received')
+    const keysToDelete = [];
+    for (const key of Object.keys(data)) {
+        console.log(`${key} = ${data[key]}`);
+        if (key.includes("opacidad")) {
+            checkandupdate_opacidad(key, data[key]);
+            keysToDelete.push(key);
+        }
+
+        if (key.includes("color")) {
+            checkandupdate_color(key, data[key]);
+            keysToDelete.push(key);
+        }
+    }
+
+    // remove after iteration
+    for (const key of keysToDelete) {
+        delete data[key];
+    }
+
     animPromise.then(resolve => {
             if (anim.currentFrame !== 0 && updateAnimation) {
                 updateTiming = framesMilliseconds * (updateDelay + loopTiming)
@@ -296,6 +315,54 @@ anim.addEventListener('complete', () => {
         nextAnimation = 'no animation'
     }
 })
+
+//Custom functions for color and opacity changes
+function getSelector(campo) {
+    return `.${campo}`;
+}
+
+function update_color(campo, color) {
+    const elements = document.querySelectorAll(getSelector(campo));
+    elements.forEach(el => el.style.setProperty("fill", color));
+}
+
+function update_opacidad(campo, value) {
+    const elements = document.querySelectorAll(getSelector(campo));
+    elements.forEach(el => el.style.setProperty("opacity", value));
+}
+
+function checkandupdate_opacidad(item, value, attempts = 0) {
+    const maxAttempts = 10;
+    const selector = getSelector(item);
+
+    if (document.querySelector(selector)) {
+        console.log(`checkandupdate_opacidad: ${item} -- exists`);
+        update_opacidad(item, value);
+    } else if (attempts < maxAttempts) {
+        console.log(`checkandupdate_opacidad: ${item} --- waiting (attempt ${attempts + 1})`);
+        setTimeout(() => checkandupdate_opacidad(item, value, attempts + 1), 100);
+    } else {
+        console.log(`checkandupdate_opacidad: ${item} -- reached max attempts (${maxAttempts})`);
+    }
+}
+
+function checkandupdate_color(item, color, attempts = 0) {
+    const maxAttempts = 10;
+    const selector = getSelector(item);
+
+    if (document.querySelector(selector)) {
+        console.log(`checkandupdate_color: ${item} -- exists`);
+        update_color(item, color);
+    } else if (attempts < maxAttempts) {
+        console.log(`checkandupdate_color: ${item} --- waiting (attempt ${attempts + 1})`);
+        setTimeout(() => checkandupdate_color(item, color, attempts + 1), 100);
+    } else {
+        console.log(`checkandupdate_color: ${item} -- reached max attempts (${maxAttempts})`);
+    }
+}
+
+
+
 
 
 //casparcg control
