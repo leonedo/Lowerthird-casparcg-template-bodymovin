@@ -317,50 +317,64 @@ anim.addEventListener('complete', () => {
 })
 
 //Custom functions for color and opacity changes
-function getSelector(campo) {
-    return `.${campo}`;
-}
-
 function update_color(campo, color) {
-    const elements = document.querySelectorAll(getSelector(campo));
-    elements.forEach(el => el.style.setProperty("fill", color));
+    const elements = document.querySelectorAll(`.${campo}`);
+    if (elements.length === 0) {
+        console.warn(`⚠️ update_color: No elements found for class "${campo}"`);
+    }
+    elements.forEach(el => {
+        el.style.setProperty("fill", color);
+        console.log(`✅ update_color: Applied color "${color}" to .${campo}`);
+    });
 }
 
 function update_opacidad(campo, value) {
-    const elements = document.querySelectorAll(getSelector(campo));
-    elements.forEach(el => el.style.setProperty("opacity", value));
-}
-
-function checkandupdate_opacidad(item, value, attempts = 0) {
-    const maxAttempts = 10;
-    const selector = getSelector(item);
-
-    if (document.querySelector(selector)) {
-        console.log(`checkandupdate_opacidad: ${item} -- exists`);
-        update_opacidad(item, value);
-    } else if (attempts < maxAttempts) {
-        console.log(`checkandupdate_opacidad: ${item} --- waiting (attempt ${attempts + 1})`);
-        setTimeout(() => checkandupdate_opacidad(item, value, attempts + 1), 100);
-    } else {
-        console.log(`checkandupdate_opacidad: ${item} -- reached max attempts (${maxAttempts})`);
+    const elements = document.querySelectorAll(`.${campo}`);
+    if (elements.length === 0) {
+        console.warn(`⚠️ update_opacidad: No elements found for class "${campo}"`);
     }
+    elements.forEach(el => {
+        el.style.setProperty("opacity", value);
+        console.log(`✅ update_opacidad: Applied opacity "${value}" to .${campo}`);
+    });
 }
 
-function checkandupdate_color(item, color, attempts = 0) {
+function normalizeValue(v) {
+    if (typeof v === "object" && v !== null && "text" in v) return v.text;
+    return v;
+}
+
+function checkandcolor(item, colorData, attempts = 0) {
+    const color = normalizeValue(colorData);
     const maxAttempts = 10;
-    const selector = getSelector(item);
+    const selector = `.${item}`;
 
     if (document.querySelector(selector)) {
-        console.log(`checkandupdate_color: ${item} -- exists`);
+        console.log(`✅ checkandcolor: Element "${item}" exists, applying color "${color}"`);
         update_color(item, color);
     } else if (attempts < maxAttempts) {
-        console.log(`checkandupdate_color: ${item} --- waiting (attempt ${attempts + 1})`);
-        setTimeout(() => checkandupdate_color(item, color, attempts + 1), 100);
+        console.log(`⏳ checkandcolor: Element "${item}" not found, retrying (attempt ${attempts + 1})`);
+        setTimeout(() => checkandcolor(item, colorData, attempts + 1), 100);
     } else {
-        console.log(`checkandupdate_color: ${item} -- reached max attempts (${maxAttempts})`);
+        console.error(`❌ checkandcolor: Failed to find element "${item}" after ${maxAttempts} attempts`);
     }
 }
 
+function checkandupdate(item, valueData, attempts = 0) {
+    const value = normalizeValue(valueData);
+    const maxAttempts = 10;
+    const selector = `.${item}`;
+
+    if (document.querySelector(selector)) {
+        console.log(`✅ checkandupdate: Element "${item}" exists, applying opacity "${value}"`);
+        update_opacidad(item, value);
+    } else if (attempts < maxAttempts) {
+        console.log(`⏳ checkandupdate: Element "${item}" not found, retrying (attempt ${attempts + 1})`);
+        setTimeout(() => checkandupdate(item, valueData, attempts + 1), 100);
+    } else {
+        console.error(`❌ checkandupdate: Failed to find element "${item}" after ${maxAttempts} attempts`);
+    }
+}
 
 
 
