@@ -435,7 +435,7 @@ webcg.on('update', function () {
 
 
 let sfxPlayed = false; // prevent it from playing multiple times
-let  audio_inframe = 0; // set this to the frame you want the sound to play
+//let  audio_inframe = 0; // set this to the frame you want the sound to play
 
 anim.addEventListener('enterFrame', (e) => {
     const currentFrame = e.currentTime;
@@ -455,4 +455,56 @@ anim.addEventListener('enterFrame', (e) => {
             sfxPlayed = true;
         }
     }
+});
+
+
+// clock: time and date formatters and updaters
+
+const ENABLE_CLOCK = window.ENABLE_CLOCK === true;
+
+const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+});
+
+const dateFormatter = new Intl.DateTimeFormat('es-DO', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+});
+
+function updateLottieText(className, text) {
+    for (let i = 0; i < anim.renderer.elements.length; i++) {
+        const el = anim.renderer.elements[i];
+
+        if (
+            el.data &&
+            el.data.cl === className &&
+            typeof el.updateDocumentData === 'function'
+        ) {
+            try {
+                el.canResizeFont(true);
+                el.updateDocumentData({ t: text }, 0);
+            } catch (e) {
+                console.log('[Clock] Failed to update', className, e);
+            }
+            return;
+        }
+    }
+}
+
+function updateClock() {
+    const now = new Date();
+    updateLottieText('time', timeFormatter.format(now));  // name of the time class
+    updateLottieText('date', dateFormatter.format(now));  // name of the date class
+}
+
+animPromise.then(() => {
+    if (!ENABLE_CLOCK) {
+        return;
+    }
+
+    updateClock();
+    setInterval(updateClock, 10 * 1000); // update every 10 seconds
 });
